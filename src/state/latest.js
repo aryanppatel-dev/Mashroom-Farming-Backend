@@ -1,7 +1,18 @@
 const latestByDevice = {};
 
 function setLatest(deviceId, data) {
-  latestByDevice[deviceId] = { ...data, ts: Date.now() };
+  latestByDevice[deviceId] = {
+    ...latestByDevice[deviceId],
+    ...data,
+    ts: Date.now(),
+  };
+}
+
+function setStatus(deviceId, status) {
+  latestByDevice[deviceId] = {
+    ...latestByDevice[deviceId],
+    status,
+  };
 }
 
 function getLatest(deviceId) {
@@ -12,4 +23,4 @@ function getAllLatest() {
   return latestByDevice;
 }
 
-module.exports = { setLatest, getLatest, getAllLatest };
+module.exports = { setLatest, setStatus, getLatest, getAllLatest };

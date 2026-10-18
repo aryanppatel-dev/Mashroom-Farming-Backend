@@ -1,6 +1,6 @@
 const mqtt = require('mqtt');
 const env = require('../config/env');
-const { setLatest } = require('../state/latest');
+const { setLatest,setStatus } = require('../state/latest');
 
 let client;
 let onDhtDataCallback = null;
@@ -48,6 +48,7 @@ function connectMqtt() {
     if (kind === 'status') {
       const status = payload.toString();
       console.log(`Device ${deviceId} is ${status}`);
+      setStatus(deviceId, status);
       if (onStatusCallback) onStatusCallback(deviceId, status);
     }
   });
