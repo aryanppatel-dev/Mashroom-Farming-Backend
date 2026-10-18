@@ -3,7 +3,8 @@ const env = require('../config/env');
 const { setLatest } = require('../state/latest');
 
 let client;
-let onDhtDataCallback = null;   // server.js isko set karega (DB save + socket emit ke liye)
+let onDhtDataCallback = null;
+let onStatusCallback = null;
 
 function connectMqtt() {
   const url = `mqtts://${env.mqtt.host}:${env.mqtt.port}`;
@@ -12,7 +13,7 @@ function connectMqtt() {
     username: env.mqtt.user,
     password: env.mqtt.pass,
     clientId: 'backend-' + Math.random().toString(16).slice(2, 8),
-    rejectUnauthorized: false,   // testing ke liye; production me true karna hai
+    rejectUnauthorized: false,
   });
 
   client.on('connect', () => {
@@ -30,7 +31,7 @@ function connectMqtt() {
   });
 
   client.on('message', (topic, payload) => {
-    const parts = topic.split('/');   // farm/esp1/dht -> ["farm","esp1","dht"]
+    const parts = topic.split('/');
     const deviceId = parts[1];
     const kind = parts[2];
 
@@ -45,7 +46,9 @@ function connectMqtt() {
     }
 
     if (kind === 'status') {
-      console.log(`Device ${deviceId} is ${payload.toString()}`);
+      const status = payload.toString();
+      console.log(`Device ${deviceId} is ${status}`);
+      if (onStatusCallback) onStatusCallback(deviceId, status);
     }
   });
 }
@@ -54,8 +57,12 @@ function onDhtData(callback) {
   onDhtDataCallback = callback;
 }
 
+function onStatus(callback) {
+  onStatusCallback = callback;
+}
+
 function publish(topic, message, options = {}) {
   client.publish(topic, message, options);
 }
 
-module.exports = { connectMqtt, onDhtData, publish };
+module.exports = { connectMqtt, onDhtData, onStatus, publish };
