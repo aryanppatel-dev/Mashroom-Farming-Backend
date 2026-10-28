@@ -1,18 +1,20 @@
 const latestByDevice = {};
 
+function ensure(deviceId) {
+  if (!latestByDevice[deviceId]) latestByDevice[deviceId] = { actuators: {} };
+  return latestByDevice[deviceId];
+}
+
 function setLatest(deviceId, data) {
-  latestByDevice[deviceId] = {
-    ...latestByDevice[deviceId],
-    ...data,
-    ts: Date.now(),
-  };
+  Object.assign(ensure(deviceId), data, { ts: Date.now() });
 }
 
 function setStatus(deviceId, status) {
-  latestByDevice[deviceId] = {
-    ...latestByDevice[deviceId],
-    status,
-  };
+  ensure(deviceId).status = status;
+}
+
+function setActuator(deviceId, name, state) {
+  ensure(deviceId).actuators[name] = state;
 }
 
 function getLatest(deviceId) {
@@ -23,4 +25,4 @@ function getAllLatest() {
   return latestByDevice;
 }
 
-module.exports = { setLatest, setStatus, getLatest, getAllLatest };
+module.exports = { setLatest, setStatus, setActuator, getLatest, getAllLatest };

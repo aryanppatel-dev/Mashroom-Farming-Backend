@@ -7,10 +7,10 @@ module.exports = {
     user: process.env.MQTT_USER,
     pass: process.env.MQTT_PASS,
   },
-  db: {
-    url: process.env.DATABASE_URL,
-  },
   server: {
     port: Number(process.env.PORT) || 4000,
+    corsOrigin: (process.env.CORS_ORIGIN || 'http://localhost:5173')
+      .split(',')
+      .map((s) => s.trim()),
   },
 };
